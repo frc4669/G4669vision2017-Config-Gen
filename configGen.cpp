@@ -17,20 +17,14 @@ using namespace std;
 void writeGlobalVar();
 
 //Global Variables
-String conf_file = "102.txt";
-
-bool save = false;
 VideoCapture cap;
-//VideoCapture cap2;
-//VideoCapture cap3;
-//VideoCapture cap4;
 
-int minH = 44;
+int minH = 0;
 int minS = 0;
-int minV = 226;
+int minV = 0;
 
-int maxH = 84;
-int maxS = 67;
+int maxH = 179;
+int maxS = 255;
 int maxV = 255;
 
 int cannyThresh = 450;
@@ -62,28 +56,28 @@ int main()
     }
 
     //cap.set(CV_CAP_PROP_BUFFERSIZE, 1);
+    namedWindow("Color Filtered", 1);
+    namedWindow("Contour", 1);
+    namedWindow("Drawing", 1);
 
-    while (save == false)
+    createTrackbar("Min H", "Color Filtered", &minH, 179);
+    createTrackbar("Max H", "Color Filtered", &maxH, 179);
+    
+    createTrackbar("Min S", "Color Filtered", &minS, 255);
+    createTrackbar("Max S", "Color Filtered", &maxS, 255);
+
+    createTrackbar("Min V", "Color Filtered", &minV, 255);
+    createTrackbar("Max V", "Color Filtered", &maxV, 255);
+
+    createTrackbar("Contour Thresh", "Contour", &cannyThresh, 500);
+    createTrackbar("Threshold Thresh", "Contour", &cannyThresh, 500);
+
+    createTrackbar("Corner Thresh", "Drawing", &cornerThresh, 500);
+
+    while (1)
     {
         if( waitKey(1) == 27 )
-        {
-            string input = "x";
-            while (input != "y", input != "n")
-            {
-                cout << "Save configuration? y n\n";
-                cin >> input;
-            }
-
-            if (input == "y")
-            {
-                //writeGlobalVar();
-                cout << "Files saved to " << conf_file << endl;
-                break; 
-            }
-            else if (input == "n")
-                break;
-        }
- 
+            break;
 
         //src = cap.grab();
         cap >> src; //**********************CHANGE LATER
@@ -95,8 +89,6 @@ int main()
             cout << "VISION ERROR: CANNOT ACCESS FRAME\n" << "VISION CORE: STOPPED\n";
             return 0;
         }
-
-        cout << "Camera working";
 
         //Blur
         GaussianBlur(src, blurred, Size(15,15), 0, 0);
@@ -144,8 +136,6 @@ int main()
             rectangle( contDrawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
         }
 
-        imshow("contDrawing", contDrawing); ///////////////////////////GET RID OF
-
         //Corner Detection
         cvtColor(contDrawing, contGray, CV_RGB2GRAY);
 
@@ -165,7 +155,7 @@ int main()
             {
                 if ((int) normal.at<float>(y,x) > cornerThresh)
                 {
-                    //circle(normal, Point(x,y), 5, Scalar(0), 2, 8, 0);
+                    circle(normal, Point(x,y), 5, Scalar(0), 2, 8, 0);
                     cout << x << " " << y << endl;
                     if (x > maxX)
                         maxX = x;
@@ -181,8 +171,25 @@ int main()
         cout << "MAX: " << maxX << " MIN: " << minX << endl;
 
         imshow("Source", src);
+        imshow("Color Filtered", filtered);
+        imshow("Contour", contDrawing);
         imshow("Drawing", normal); //Keep uncommented in development to avoid videoio error
     }
+       
+    string input = "x";
+    while (input != "y", input != "n")
+    {
+        cout << "Save configuration? y n\n>> ";
+        cin >> input;
+        if (input == "y")
+        {
+            writeGlobalVar();
+            break; 
+        }
+        else if (input == "n")
+            break;
+    }
+
 
     cout << "VISION CORE: STOPPED\n";
 
@@ -191,28 +198,28 @@ int main()
 
 void writeGlobalVar()
 {
-    ifstream config;
+    string conf_file;
+    ofstream config;
+
+    cout << "VISION CORE: WHAT TO WRITE TO?\n>> ";
+    cin >> conf_file;
+
     config.open(conf_file.c_str());
 
-    if (config)
-    {
         cout << "VISION CORE: VARIABLE PRESET LOADING STARTED\n";
 
-        config >> minH;
-        config >> minS;
-        config >> minV;
-        config >> maxH;
-        config >> maxS;
-        config >> maxV;
-        config >> cannyThresh;
-        config >> thresholdThresh;
-        config >> cornerThresh;
+        config << minH << endl;
+        config << maxH << endl;
+        config << minS << endl;
+        config << maxS << endl;
+        config << minV << endl;
+        config << maxV << endl;
+        config << cannyThresh << endl;
+        config << thresholdThresh << endl;
+        config << cornerThresh;
 
         cout << "VISION CORE: VARIABLE PRESET LOADING SUCCESSFUL\n";
 
         config.close();
-    }
-    else
-        cout << "VISION ERROR: CANNOT ACCESS PRE-SET VARIABLE, VARIABLES SET TO DEFAULT VALUES\n"; 
 
 }

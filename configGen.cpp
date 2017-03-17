@@ -19,6 +19,8 @@ void writeGlobalVar();
 //Global Variables
 VideoCapture cap;
 
+//int exposure = 0;
+
 int minH = 0;
 int minS = 0;
 int minV = 0;
@@ -56,6 +58,7 @@ int main()
     }
 
     //cap.set(CV_CAP_PROP_BUFFERSIZE, 1);
+    namedWindow("Source", 1);
     namedWindow("Color Filtered", 1);
     namedWindow("Contour", 1);
     namedWindow("Drawing", 1);
@@ -71,11 +74,16 @@ int main()
 
     createTrackbar("Contour Thresh", "Contour", &cannyThresh, 500);
     createTrackbar("Threshold Thresh", "Contour", &cannyThresh, 500);
+    createTrackbar("Contour length", "Contour", &contour_length_threshold , 1000);
 
     createTrackbar("Corner Thresh", "Drawing", &cornerThresh, 500);
 
+    //createTrackbar("Exposure", "Source", &exposure, 100);
+
     while (1)
     {
+        //cap.set(CV_CAP_PROP_EXPOSURE, exposure - 100);
+
         if( waitKey(1) == 27 )
             break;
 
@@ -113,7 +121,7 @@ int main()
         vector<vector<Point> > contours_poly(contours.size());
         vector<Rect> boundRect(contours.size());
 
-        /*Filter out small countour
+        //Filter out small countour
         for(vector<vector<Point> >::iterator it = contours.begin(); it!=contours.end();)
         {
             if (it->size()<contour_length_threshold)
@@ -121,7 +129,7 @@ int main()
             else
                 ++it;
         }
-*/
+
 
         //Draw contour
         for(size_t i = 0; i < contours.size(); i++)
@@ -216,7 +224,9 @@ void writeGlobalVar()
         config << maxV << endl;
         config << cannyThresh << endl;
         config << thresholdThresh << endl;
-        config << cornerThresh;
+        config << cornerThresh << endl;
+        config << contour_length_threshold;
+
 
         cout << "VISION CORE: VARIABLE PRESET LOADING SUCCESSFUL\n";
 

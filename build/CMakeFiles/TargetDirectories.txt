@@ -1,3 +1,0 @@
-/home/cyanide/Desktop/G4669vision2017-Config-Gen/build/CMakeFiles/edit_cache.dir
-/home/cyanide/Desktop/G4669vision2017-Config-Gen/build/CMakeFiles/rebuild_cache.dir
-/home/cyanide/Desktop/G4669vision2017-Config-Gen/build/CMakeFiles/cv_configGen.dir

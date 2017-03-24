@@ -2,7 +2,7 @@
 * Galileo Robotics Computer Vision Config Generator
 * @author  Kenny Ngo
 * @date    3/16/2017
-* @version 1.0
+* @version 2.0
 */
 
 #include "opencv2/opencv.hpp"
@@ -15,6 +15,7 @@ using namespace std;
 
 //Prototypes
 void writeGlobalVar();
+void loadGlobalVar();
 
 //Global Variables
 VideoCapture cap;
@@ -58,6 +59,9 @@ int main()
     }
 
     //cap.set(CV_CAP_PROP_BUFFERSIZE, 1);
+
+    loadGlobalVar();
+
     namedWindow("Source", 1);
     namedWindow("Color Filtered", 1);
     namedWindow("Contour", 1);
@@ -88,8 +92,8 @@ int main()
             break;
 
         //src = cap.grab();
-        cap >> src; //**********************CHANGE LATER
-        //src = imread("dark.jpg", 1);
+        //cap >> src; //**********************CHANGE LATER
+        src = imread("4.png", 1);
 
         //Checks if frame is empty
         if (src.empty())
@@ -105,7 +109,11 @@ int main()
         assert(blurred.type() == CV_8UC3);
         cvtColor(blurred, blurredHSV, CV_BGR2HSV);
         inRange(blurredHSV, Scalar(minH, minS, minV), Scalar(maxH, maxS, maxV), tempProcessed);
+
+
         bitwise_and(blurred, blurred, filtered, tempProcessed = tempProcessed);
+
+        imshow("Color Filtered", filtered);
 
         cvtColor(filtered, filtered, CV_HSV2BGR);
         cvtColor(filtered, filtered, CV_BGR2GRAY);
@@ -185,7 +193,6 @@ int main()
         cout << "Contours: " << contours.size() << endl;
 
         imshow("Source", src);
-        imshow("Color Filtered", filtered);
         imshow("Contour", contDrawing);
         imshow("Drawing", normal); //Keep uncommented in development to avoid videoio error
     }
@@ -237,5 +244,42 @@ void writeGlobalVar()
         cout << "VISION CORE: VARIABLE PRESET LOADING SUCCESSFUL\n";
 
         config.close();
+
+}
+
+void loadGlobalVar()
+{
+    ifstream config;
+    string load;
+
+    cout << "VISION CORE: Load Previous File? *Type ""n"" to skip\n>> "; 
+    cin >> load;
+
+    if ( load == "n")
+        exit;
+
+    config.open(load.c_str());
+
+    if (config)
+    {
+        cout << "VISION CORE: VARIABLE PRESET LOADING STARTED\n";
+
+        config >> minH;
+        config >> maxH;
+        config >> minS;
+        config >> maxS;
+        config >> minV;
+        config >> maxV;
+        config >> cannyThresh;
+        config >> thresholdThresh;
+        config >> cornerThresh;
+        config >> contour_length_threshold;
+
+        cout << "VISION CORE: VARIABLE PRESET LOADING SUCCESSFUL\n";
+
+        config.close();
+    }
+    else
+        cout << "VISION ERROR: CANNOT ACCESS PRE-SET VARIABLE, VARIABLES SET TO DEFAULT VALUES\n"; 
 
 }

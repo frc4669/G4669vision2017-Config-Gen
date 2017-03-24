@@ -144,6 +144,11 @@ int main()
             rectangle( contDrawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0 );
         }
 
+//Add to other program later
+        //for(size_t i = 0; i < contours.size(); i++)
+        //{
+            
+
         //Corner Detection
         cvtColor(contDrawing, contGray, CV_RGB2GRAY);
 
@@ -177,6 +182,7 @@ int main()
         width = maxX - minX;
         cout << centerX << " " << width << endl;
         cout << "MAX: " << maxX << " MIN: " << minX << endl;
+        cout << "Contours: " << contours.size() << endl;
 
         imshow("Source", src);
         imshow("Color Filtered", filtered);
